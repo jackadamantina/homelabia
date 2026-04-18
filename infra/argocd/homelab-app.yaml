@@ -1,0 +1,44 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: homelab-app
+  namespace: argocd
+  annotations:
+    # Força re-sync ao detectar qualquer drift entre o cluster e o Git
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/jackadamantina/homelabia.git
+    targetRevision: HEAD          # sempre aponta para o topo da branch main
+    path: infra/helm/app          # diretório com os manifestos Kubernetes
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+
+  syncPolicy:
+    automated:
+      prune: true       # remove recursos deletados do Git
+      selfHeal: true    # corrige drift manual no cluster
+    syncOptions:
+      - CreateNamespace=true
+      - RespectIgnoreDifferences=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
+
+  # Ignora campos injetados pelo Kubernetes que não existem no Git
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/template/metadata/annotations
+    - group: apps
+      kind: StatefulSet
+      jsonPointers:
+        - /spec/template/metadata/annotations

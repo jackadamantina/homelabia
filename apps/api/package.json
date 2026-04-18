@@ -1,0 +1,12 @@
+{
+  "name": "homelab-api",
+  "version": "1.0.0",
+  "description": "API de demonstração para o Homelab DevOps",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
