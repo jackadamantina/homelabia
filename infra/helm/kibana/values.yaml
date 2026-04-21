@@ -1,0 +1,27 @@
+image: "kibana-local"
+imageTag: "8.5.1"
+imagePullPolicy: Never
+
+replicas: 1
+
+elasticsearchHosts: "http://elasticsearch-master:9200"
+
+# Sem TLS, sem autenticação (ES security disabled)
+extraEnvs:
+  - name: ELASTICSEARCH_USERNAME
+    value: ""
+  - name: ELASTICSEARCH_PASSWORD
+    value: ""
+
+resources:
+  requests:
+    cpu: "200m"
+    memory: "512Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1Gi"
+
+readinessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 20
+  failureThreshold: 10
